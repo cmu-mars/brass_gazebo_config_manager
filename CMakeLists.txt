@@ -120,10 +120,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/brass_gazebo_config_manager.cpp
-# )
+# Declare a C++ library
+ add_library(${PROJECT_NAME}
+   src/config_plugin.cpp
+ )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
