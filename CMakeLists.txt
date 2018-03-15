@@ -145,7 +145,7 @@ include_directories(
 # Declare a C++ library
 add_library(config_manager SHARED src/config_plugin.cpp)
 add_dependencies(config_manager ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(config_manager ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES} ${JSONCPP_LIBRARIES})
+target_link_libraries(config_manager ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

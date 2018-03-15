@@ -1,19 +1,11 @@
 #include <gazebo/common/Plugin.hh>
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/physics.hh"
 #include <ros/ros.h>
-#include <ros/subscribe_options.h>
 #include "ROS_debugging.h"
 #include "std_msgs/String.h"
 #include "jsoncpp/json/json.h"
 #include "brass_gazebo_battery/SetLoad.h"
 #include "brass_gazebo_config_manager/SetConfig.h"
-#include <boost/thread/mutex.hpp>
-
-
-#include <fstream>
-#include <iostream>
-#define CONFIGURATION_DEBUG
 
 namespace gazebo{
 class GAZEBO_VISIBLE ConfigurationPlugin : public ModelPlugin
@@ -30,6 +22,7 @@ protected: Json::Value config_list;
 
     public: ConfigurationPlugin()
     {
+        ROS_GREEN_STREAM("Creating the configuration manager plugin");
         this->power_load = 0;
         this->default_config = 0;
         this->current_config = this->default_config;
@@ -68,6 +61,8 @@ protected: Json::Value config_list;
         Json::Reader json_reader;
         std::string config_path = _sdf->Get<std::string>("config_list_path");
         this->default_config = _sdf->Get<int>("default_config");
+        this->current_config = this->default_config;
+
         std::ifstream config_file(config_path, std::ifstream::binary);
         json_reader.parse(config_file, this->config_list, false);
 
@@ -76,8 +71,9 @@ protected: Json::Value config_list;
     public: virtual void Init()
     {
         std::string load = config_list[std::to_string(this->default_config)]["power_load"].asString();
-        this->power_load = std::stoi(load.c_str());
+        this->power_load = std::stod(load.c_str());
         SetPowerLoad(this->power_load);
+        ROS_GREEN_STREAM("Default configuration has been set");
     }
 
 public: bool SetPowerLoad(double power_load)
@@ -104,7 +100,7 @@ public: bool SetConfiguration(brass_gazebo_config_manager::SetConfig::Request &r
         this->current_config = req.current_config;
         ROS_GREEN_STREAM("New configuration of the robot: " << this->current_config);
         std::string load = config_list[std::to_string(this->current_config)]["power_load"].asString();
-        this->power_load = std::stoi(load.c_str());
+        this->power_load = std::stod(load.c_str());
         SetPowerLoad(this->power_load);
         lock.unlock();
         res.result = true;
