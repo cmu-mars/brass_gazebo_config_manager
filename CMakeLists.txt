@@ -77,11 +77,10 @@ pkg_check_modules(JSONCPP jsoncpp)
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ add_service_files(
+   FILES
+   SetConfig.srv
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -91,10 +90,10 @@ pkg_check_modules(JSONCPP jsoncpp)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -128,7 +127,7 @@ pkg_check_modules(JSONCPP jsoncpp)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES brass_gazebo_config_manager
-  CATKIN_DEPENDS gazebo_plugins roscpp roslib rospy
+  CATKIN_DEPENDS gazebo_plugins roscpp roslib rospy std_msgs
 )
 
 ###########
@@ -207,6 +206,11 @@ target_link_libraries(config_manager ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES} ${J
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+install(TARGETS
+        config_manager
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        )
 
 #############
 ## Testing ##
