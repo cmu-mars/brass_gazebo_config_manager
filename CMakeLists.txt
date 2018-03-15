@@ -8,10 +8,33 @@ project(brass_gazebo_config_manager)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  roslib
-  rospy
-)
+        gazebo_dev
+        gencpp
+        message_generation
+        gazebo_msgs
+        roscpp
+        rospy
+        nodelet
+        angles
+        std_srvs
+        geometry_msgs
+        sensor_msgs
+        nav_msgs
+        urdf
+        tf
+        tf2_ros
+        dynamic_reconfigure
+        rosgraph_msgs
+        trajectory_msgs
+        image_transport
+        rosconsole
+        cv_bridge
+        polled_camera
+        diagnostic_updater
+        camera_info_manager
+        )
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(JSONCPP jsoncpp)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -103,10 +126,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES brass_gazebo_config_manager
-#  CATKIN_DEPENDS roscpp roslib rospy
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES brass_gazebo_config_manager
+  CATKIN_DEPENDS gazebo_plugins roscpp roslib rospy
 )
 
 ###########
@@ -118,12 +140,13 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${JSONCPP_INCLUDE_DIRS}
 )
 
 # Declare a C++ library
- add_library(${PROJECT_NAME}
-   src/config_plugin.cpp
- )
+add_library(config_manager SHARED src/config_plugin.cpp)
+add_dependencies(config_manager ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(config_manager ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES} ${JSONCPP_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
