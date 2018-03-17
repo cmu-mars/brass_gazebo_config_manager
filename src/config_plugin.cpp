@@ -19,6 +19,8 @@ protected: ros::ServiceClient power_load_client;
 protected: ros::ServiceServer set_bot_configuration;
 protected: boost::mutex lock;
 protected: Json::Value config_list;
+private: const char * home = getenv("HOME");
+
 
     public: ConfigurationPlugin()
     {
@@ -63,7 +65,8 @@ protected: Json::Value config_list;
         this->default_config = _sdf->Get<int>("default_config");
         this->current_config = this->default_config;
 
-        std::ifstream config_file(config_path, std::ifstream::binary);
+
+        std::ifstream config_file(home + config_path, std::ifstream::binary);
         json_reader.parse(config_file, this->config_list, false);
 
     }
