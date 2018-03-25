@@ -6,6 +6,7 @@
 #include "jsoncpp/json/json.h"
 #include "brass_gazebo_battery/SetLoad.h"
 #include "brass_gazebo_config_manager/SetConfig.h"
+#include "brass_gazebo_config_manager/GetConfig.h"
 
 namespace gazebo{
 class GAZEBO_VISIBLE ConfigurationPlugin : public ModelPlugin
@@ -17,6 +18,7 @@ protected: physics::ModelPtr model;
 protected: std::unique_ptr<ros::NodeHandle> rosNode;
 protected: ros::ServiceClient power_load_client;
 protected: ros::ServiceServer set_bot_configuration;
+protected: ros::ServiceServer get_bot_configuration;
 protected: boost::mutex lock;
 protected: Json::Value config_list;
 private: const char * home = getenv("HOME");
@@ -59,6 +61,7 @@ private: const char * home = getenv("HOME");
 
         this->power_load_client = this->rosNode->serviceClient<brass_gazebo_battery::SetLoad>(this->model->GetName() + "/set_power_load");
         this->set_bot_configuration = this->rosNode->advertiseService(this->model->GetName() + "/set_robot_configuration", &ConfigurationPlugin::SetConfiguration, this);
+        this->get_bot_configuration = this->rosNode->advertiseService(this->model->GetName() + "/get_robot_configuration", &ConfigurationPlugin::GetConfiguration, this);
 
         Json::Reader json_reader;
         std::string config_path = _sdf->Get<std::string>("config_list_path");
@@ -107,6 +110,19 @@ public: bool SetConfiguration(brass_gazebo_config_manager::SetConfig::Request &r
         SetPowerLoad(this->power_load);
         lock.unlock();
         res.result = true;
+        return true;
+    }
+
+public: bool GetConfiguration(brass_gazebo_config_manager::GetConfig::Request &req,
+                                brass_gazebo_config_manager::GetConfig::Response &res)
+    {
+        lock.lock();
+        if (req.give_current_config)
+        {
+            ROS_GREEN_STREAM("The current configuration was requested: " << this->current_config);
+            res.result = this->current_config;
+        }
+        lock.unlock();
         return true;
     }
 

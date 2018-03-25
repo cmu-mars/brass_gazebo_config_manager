@@ -1,0 +1,3 @@
+bool give_current_config
+---
+int64 result

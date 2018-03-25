@@ -79,6 +79,7 @@ pkg_check_modules(JSONCPP jsoncpp)
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
+   GetConfig.srv
    SetConfig.srv
  )
 
