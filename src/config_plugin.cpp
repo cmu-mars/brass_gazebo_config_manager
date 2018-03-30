@@ -11,7 +11,7 @@
 namespace gazebo{
 class GAZEBO_VISIBLE ConfigurationPlugin : public ModelPlugin
 {
-protected: double power_load;
+protected: float power_load;
 protected: int default_config;
 protected: int current_config;
 protected: physics::ModelPtr model;
@@ -72,17 +72,36 @@ private: const char * home = getenv("HOME");
         std::ifstream config_file(home + config_path, std::ifstream::binary);
         json_reader.parse(config_file, this->config_list, false);
 
+        ROS_GREEN_STREAM("Configuration Plugin is fully loaded.");
+    }
+
+    private: float get_power_load_by_id(int config_id)
+    {
+        for (const Json::Value& config: this->config_list["configurations"])
+        {
+            if (config["config_id"] == config_id)
+            {
+                return config["power_load_w"].asFloat();
+            }
+        }
+
     }
 
     public: virtual void Init()
     {
-        std::string load = config_list[std::to_string(this->default_config)]["power_load"].asString();
-        this->power_load = std::stod(load.c_str());
+        ROS_GREEN_STREAM("Init Config Manager");
+        this->power_load = get_power_load_by_id(this->default_config);
+        ROS_GREEN_STREAM(this->power_load);
         SetPowerLoad(this->power_load);
         ROS_GREEN_STREAM("Default configuration has been set");
     }
 
-public: bool SetPowerLoad(double power_load)
+    public: virtual void Reset()
+    {
+        this->Init();
+    }
+
+    public: bool SetPowerLoad(float power_load)
     {
         brass_gazebo_battery::SetLoad srv;
         srv.request.power_load = power_load;
@@ -93,27 +112,26 @@ public: bool SetPowerLoad(double power_load)
             return true;
         }
         else{
-            ROS_RED_STREAM("An error happened calling power load service set");
+            ROS_RED_STREAM("An error happened calling power load service");
             return false;
         }
 
     }
 
-public: bool SetConfiguration(brass_gazebo_config_manager::SetConfig::Request &req,
+    public: bool SetConfiguration(brass_gazebo_config_manager::SetConfig::Request &req,
                                 brass_gazebo_config_manager::SetConfig::Response &res)
     {
         lock.lock();
         this->current_config = req.current_config;
         ROS_GREEN_STREAM("New configuration of the robot: " << this->current_config);
-        std::string load = config_list[std::to_string(this->current_config)]["power_load"].asString();
-        this->power_load = std::stod(load.c_str());
+        this->power_load = get_power_load_by_id(this->current_config);
         SetPowerLoad(this->power_load);
         lock.unlock();
         res.result = true;
         return true;
     }
 
-public: bool GetConfiguration(brass_gazebo_config_manager::GetConfig::Request &req,
+    public: bool GetConfiguration(brass_gazebo_config_manager::GetConfig::Request &req,
                                 brass_gazebo_config_manager::GetConfig::Response &res)
     {
         lock.lock();
