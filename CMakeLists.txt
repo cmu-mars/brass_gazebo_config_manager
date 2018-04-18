@@ -35,6 +35,7 @@ find_package(catkin REQUIRED COMPONENTS
         )
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp)
+find_package(ignition-math2 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -142,12 +143,13 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   ${JSONCPP_INCLUDE_DIRS}
+  ${IGNITION-MATH2_INCLUDE_DIRS}
 )
 
 # Declare a C++ library
 add_library(config_manager SHARED src/config_plugin.cpp)
 add_dependencies(config_manager ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(config_manager ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES})
+target_link_libraries(config_manager ${roscpp_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${JSONCPP_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
