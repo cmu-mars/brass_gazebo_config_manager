@@ -2324,7 +2324,7 @@
 
         <plugin filename="libconfig_manager.so" name="configuration_manager">
 
-          <config_list_path>/cp1/config/config_list.json</config_list_path>
+          <config_list_path>/cp1/config_list.json</config_list_path>
           <default_config>0</default_config>
           <ros_node>cp1_node</ros_node>
 
