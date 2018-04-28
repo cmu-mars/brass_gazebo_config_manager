@@ -1,5 +1,5 @@
 # Functionality
-The configuration manager of the bot that receives the power consumption of a list of robot configurations and maintain the current configuration of the robot. When the configuration of the robot will change, it will reflect the change to power consumption by changing the power load of the robot battery plugin.
+The configuration manager of the bot that receives the power consumption of a list of robot configurations and maintain the current configuration of the robot. When the configuration of the robot will change, it will reflect the change to power consumption by changing the power load of the [robot battery plugin](https://github.com/cmu-mars/brass_gazebo_battery).
 
 # Support
 This plugin is tested for ROS kinetic and Gazebo 7.8.1.
@@ -73,12 +73,6 @@ This Gazebo plugin expose several services that can be accessed via ROS:
 /battery_monitor_client/battery_demo_model/set_config
 ```
 
-Also, this publish information about the status of robot battery to the following topics:
-```
-/mobile_base/commands/charge_level
-/mobile_base/commands/motor_power
-```
-
 # Extending ROS Services
 
 First create the service description file `.srv` and put it in the `srv` folder. Then declare it in the `CMakeList.txt` in the
@@ -90,7 +84,7 @@ std_msgs  # Or other packages containing msgs
 )
 ```
 
-For updating the parameters of the battery model we use ROS services,
+For setting and getting configuration of the robot we use ROS services,
 so here we explain how to add new services to the code if needed:
 
 ```bash
@@ -100,17 +94,18 @@ catkin_make
 The header files associated to the service can be found here:
 
 ```bash
-cd ~/catkin_ws/devel/include/brass_gazebo_battery
+cd ~/catkin_ws/devel/include/brass_gazebo_config_manager
 ```
 The add the following header into the code that want to use the services:
 
 ```cpp
-#include "brass_gazebo_battery/SetLoad.h"
+#include "brass_gazebo_config_manager/SetLoad.h"
 ```
 And then add the following declaration:
 
 ```cpp
-public: bool ServiceName(brass_gazebo_battery::SetLoad::Request& req, brass_gazebo_battery::SetLoad::Response& res);
+public: bool GetConfiguration(brass_gazebo_config_manager::GetConfig::Request &req,
+                                brass_gazebo_config_manager::GetConfig::Response &res)
 ```
 The service can then be advertised as follows:
 
